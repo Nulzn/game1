@@ -10,7 +10,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("lightblue")
+    screen.fill("lightblue") #Gör skärmen ljusblå
 
     pygame.display.flip()
 
