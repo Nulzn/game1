@@ -1,5 +1,6 @@
 HEIGHT, WIDTH = 1280, 720
 FPS = 60
-MOVEMENT_SPEED = 300
 
-therus = 69
+# Player Constants
+MOVEMENT_SPEED = 300
+PLAYER_SIZE = 40

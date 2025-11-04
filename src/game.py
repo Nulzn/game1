@@ -1,5 +1,6 @@
 # Example file showing a circle moving on screen
-import pygame
+import pygame as pg
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
 
 file = "assets/sounds/soundtrack.mp3"
 # pg setup
@@ -26,16 +27,16 @@ while running:
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("lightblue")
 
-    pg.draw.circle(screen, "yellow", player_pos, 40)
+    pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w] and player_pos.y > 0:
+    keys = pg.key.get_pressed()
+    if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= 300 * dt
-    if keys[pygame.K_s] and player_pos.y < screen.get_height():
+    if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
         player_pos.y += 300 * dt
-    if keys[pygame.K_a] and player_pos.x > 0:
+    if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
         player_pos.x -= 300 * dt
-    if keys[pygame.K_d] and player_pos.x < screen.get_width():
+    if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
         player_pos.x += 300 * dt
 
     # flip() the display to put your work on screen
@@ -46,4 +47,4 @@ while running:
     # independent physics.
     dt = clock.tick(FPS) / 1000
 
-pygame.quit()
+pg.quit()
