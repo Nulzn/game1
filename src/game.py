@@ -1,5 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame
+
 file = "assets/sounds/soundtrack.mp3"
 # pygame setup
 pygame.init()
@@ -28,13 +29,13 @@ while running:
     pygame.draw.circle(screen, "yellow", player_pos, 40)
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:
+    if keys[pygame.K_w] and player_pos.y > 0:
         player_pos.y -= 300 * dt
-    if keys[pygame.K_s]:
+    if keys[pygame.K_s] and player_pos.y < screen.get_height():
         player_pos.y += 300 * dt
-    if keys[pygame.K_a]:
+    if keys[pygame.K_a] and player_pos.x > 0:
         player_pos.x -= 300 * dt
-    if keys[pygame.K_d]:
+    if keys[pygame.K_d] and player_pos.x < screen.get_width():
         player_pos.x += 300 * dt
 
     # flip() the display to put your work on screen
