@@ -17,6 +17,16 @@ running = True
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
+# bullet inställningar
+bullet_color = (255, 0, 0)
+bullet_speed = 7
+bullets = []
+
+# bullet autoskjut timing
+shoot_delay = 300  # millisekunder mellan skott
+last_shot_time = pg.time.get_ticks()
+
+
 while running:
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
@@ -38,6 +48,31 @@ while running:
         player_pos.x -= 300 * dt
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
         player_pos.x += 300 * dt
+
+    #auto skjut
+
+    current_time = pg.time.get_ticks()
+
+    if current_time - last_shot_time >= shoot_delay:
+
+        bullet=pg.Rect(player_pos.x - 3, player_pos.y - 40, 6, 12)
+
+        bullets.append(bullet)
+
+        last_shot_time = current_time
+
+        #flytta bullets
+    for bullet in bullets[:]:
+
+        bullet.y -= bullet_speed
+
+        if bullet.bottom < 0:
+
+            bullets.remove(bullet)
+    for bullet in bullets:
+
+                pg.draw.rect(screen, bullet_color, bullet)
+
 
     # flip() the display to put your work on screen
     pg.display.flip()
