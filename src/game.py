@@ -1,20 +1,49 @@
-import pygame as pg
-from config import HEIGHT, WIDTH, FPS
+# Example file showing a circle moving on screen
+import pygame
+file = "assets/sounds/soundtrack.mp3"
+# pygame setup
+pygame.init()
+pygame.mixer.init()
 
-pg.init()
-screen = pg.display.set_mode((HEIGHT, WIDTH))
-clock = pg.time.Clock()
+pygame.mixer.music.load(file)
+
+pygame.mixer.music.play()
+
+screen = pygame.display.set_mode((1280, 720))
+clock = pygame.time.Clock()
 running = True
+dt = 0
+
+player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 while running:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
+    # poll for events
+    # pygame.QUIT event means the user clicked X to close your window
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("lightblue") #Gör skärmen ljusblå
+    # fill the screen with a color to wipe away anything from last frame
+    screen.fill("lightblue")
 
-    pg.display.flip()
+    pygame.draw.circle(screen, "yellow", player_pos, 40)
 
-    clock.tick(FPS)  # limits FPS to 60
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
+        player_pos.y -= 300 * dt
+    if keys[pygame.K_s]:
+        player_pos.y += 300 * dt
+    if keys[pygame.K_a]:
+        player_pos.x -= 300 * dt
+    if keys[pygame.K_d]:
+        player_pos.x += 300 * dt
 
-pg.quit()
+    # flip() the display to put your work on screen
+    pygame.display.flip()
+
+    # limits FPS to 60
+    # dt is delta time in seconds since last frame, used for framerate-
+    # independent physics.
+    dt = clock.tick(60) / 1000
+
+pygame.quit()
