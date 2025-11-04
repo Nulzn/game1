@@ -2,31 +2,31 @@
 import pygame
 
 file = "assets/sounds/soundtrack.mp3"
-# pygame setup
-pygame.init()
-pygame.mixer.init()
+# pg setup
+pg.init()
+pg.mixer.init()
 
-pygame.mixer.music.load(file)
+pg.mixer.music.load(file)
 
-pygame.mixer.music.play()
+pg.mixer.music.play()
 
-screen = pygame.display.set_mode((1280, 720))
-clock = pygame.time.Clock()
+screen = pg.display.set_mode((HEIGHT, WIDTH))
+clock = pg.time.Clock()
 running = True
 
-player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
 while running:
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    # pg.QUIT event means the user clicked X to close your window
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("lightblue")
 
-    pygame.draw.circle(screen, "yellow", player_pos, 40)
+    pg.draw.circle(screen, "yellow", player_pos, 40)
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w] and player_pos.y > 0:
@@ -39,11 +39,11 @@ while running:
         player_pos.x += 300 * dt
 
     # flip() the display to put your work on screen
-    pygame.display.flip()
+    pg.display.flip()
 
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(FPS) / 1000
 
 pygame.quit()
