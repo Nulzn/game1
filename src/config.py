@@ -1,2 +1,4 @@
 HEIGHT, WIDTH = 1080, 600
 FPS = 60
+
+therus = 69
