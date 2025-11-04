@@ -1,5 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame as pg
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED
 file = "assets/sounds/soundtrack.mp3"
 # pg setup
 pg.init()
@@ -9,7 +10,7 @@ pg.mixer.music.load(file)
 
 pg.mixer.music.play()
 
-screen = pg.display.set_mode((1280, 720))
+screen = pg.display.set_mode((HEIGHT, WIDTH))
 clock = pg.time.Clock()
 running = True
 
@@ -29,13 +30,13 @@ while running:
 
     keys = pg.key.get_pressed()
     if keys[pg.K_w]:
-        player_pos.y -= 300 * dt
+        player_pos.y -= MOVEMENT_SPEED * dt
     if keys[pg.K_s]:
-        player_pos.y += 300 * dt
+        player_pos.y += MOVEMENT_SPEED * dt
     if keys[pg.K_a]:
-        player_pos.x -= 300 * dt
+        player_pos.x -= MOVEMENT_SPEED * dt
     if keys[pg.K_d]:
-        player_pos.x += 300 * dt
+        player_pos.x += MOVEMENT_SPEED * dt
 
     # flip() the display to put your work on screen
     pg.display.flip()
@@ -43,6 +44,6 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(FPS) / 1000
 
 pg.quit()
