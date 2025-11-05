@@ -3,10 +3,9 @@ import pygame as pg
 import pygame_gui as pgg
 from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
 from utils.Sound import GetSoundById
-from entities.Enemy import Enemy
 ### ENTITIES ###
 from entities.Player import Player
-from entities.Enemy import Enemy1, Enemy2
+from entities.Enemy import Enemy
 from entities.Boss import Boss
 
 ### GUI ###
@@ -56,17 +55,24 @@ last_move_direction = pg.Vector2(0, -1)
 dt = 0 # Delta Time
 
 score = 0
+enemies_killed = 0
+wave_size = 2
+enemies_left_in_wave = wave_size
+enemy_move_speed = 25 
 
-
-def spawn_enemy():
+def spawn_enemy(enemy_move_speed=25):
 
     enemy = Enemy()
-    enemy.spawn(player_pos)
+    enemy.spawn(player_pos, enemy_move_speed)
     enemies.append(enemy)
+
+def next_wave():
+    
+    pass
 
 #def main():
     
-for _ in range(5):
+for _ in range(wave_size):
     spawn_enemy()
 
 while running:
@@ -88,7 +94,13 @@ while running:
     # Fill the screen with a color to wipe away anything from last frame
     #screen.fill("lightblue")
 
-  
+    if enemies_left_in_wave <= 0:
+        # Spawn new Wave 
+        wave_size += 2
+        enemy_move_speed += 20
+        enemies_left_in_wave = wave_size
+        for _ in range(wave_size):
+            spawn_enemy(enemy_move_speed)
     
     #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
@@ -107,7 +119,6 @@ while running:
         enemy.update(dt,player_pos)
     
     #auto skjut
-        player_pos.x += MOVEMENT_SPEED * dt
 
     # Automatic Shooting
     current_time = pg.time.get_ticks()
@@ -134,10 +145,32 @@ while running:
     for bullet in bullets[:]:
         bullet["pos"] += bullet["dir"] * bullet_speed * dt
         if (
-            bullet["pos"].x < 0 or bullet["pos"].x > WIDTH
-            or bullet["pos"].y < 0 or bullet["pos"].y > HEIGHT
+            bullet["pos"].x < 0 or bullet["pos"].x > screen.get_width()
+            or bullet["pos"].y < 0 or bullet["pos"].y > screen.get_height()
         ):
             bullets.remove(bullet)
+
+    ## Collisions:
+
+    # Has enemy collided with player ?
+    #if player_not_immune: # to be one-tapped
+    for enemy in enemies:
+        if enemy.check_collision_with(player_pos, PLAYER_SIZE):
+            print("big dmg to player", enemy.pos)
+                # Maybe add knockback or immun frames
+
+    # Has bullet collided with enemy ?
+    for enemy in enemies:
+        for bullet in bullets[:]:
+            if enemy.check_collision_with(bullet["pos"], bullet_radius):
+                if enemy.deal_dmg(2):
+                    enemies.remove(enemy)
+                    enemies_killed += 1
+                    enemies_left_in_wave -= 1
+                bullets.remove(bullet)
+
+
+    pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
 
     # rita bullets
     for bullet in bullets:
@@ -145,7 +178,6 @@ while running:
 
     for enemy in enemies:
         enemy.draw(screen)
-        pass
 
     # flip() the display to put your work on screen
     pg.display.flip()
