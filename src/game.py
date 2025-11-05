@@ -1,6 +1,9 @@
 # Example file showing a circle moving on screen
 import pygame as pg
 from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
+import math
+
+from entities.Enemy import Enemy
 
 file = "assets/sounds/soundtrack.mp3"
 # pg setup
@@ -9,13 +12,16 @@ pg.mixer.init()
 
 pg.mixer.music.load(file)
 
-pg.mixer.music.play()
+#pg.mixer.music.play()
 
 screen = pg.display.set_mode((HEIGHT, WIDTH))
 clock = pg.time.Clock()
 running = True
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+#enemy_pos = pg.Vector2(PLAYER_SIZE*10, PLAYER_SIZE*10)
+enemies = []
+
 
 # bullet inställningar
 bullet_color = (255, 0, 0)
@@ -27,19 +33,37 @@ shoot_delay = 300  # millisekunder mellan skott
 last_shot_time = pg.time.get_ticks()
 
 
+def spawn_enemy():
+
+    enemy = Enemy()
+    enemy.spawn(player_pos)
+    enemies.append(enemy)
+
+#def main():
+    
+for _ in range(5):
+    spawn_enemy()
+
 while running:
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+    dt = clock.tick(FPS) / 1000
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("lightblue")
+    #direction = player_pos - enemy_pos
+    #if direction.length() > 0:
+    #     direction = direction.normalize()
+    #enemy_pos += direction * 200
 
-    pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
-
+  
+    
+    #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
+    
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= 300 * dt
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
@@ -49,6 +73,9 @@ while running:
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
         player_pos.x += 300 * dt
 
+    for enemy in enemies:
+        enemy.update(dt,player_pos)
+    
     #auto skjut
 
     current_time = pg.time.get_ticks()
@@ -56,9 +83,7 @@ while running:
     if current_time - last_shot_time >= shoot_delay:
 
         bullet=pg.Rect(player_pos.x - 3, player_pos.y - 40, 6, 12)
-
         bullets.append(bullet)
-
         last_shot_time = current_time
 
         #flytta bullets
@@ -67,12 +92,20 @@ while running:
         bullet.y -= bullet_speed
 
         if bullet.bottom < 0:
-
             bullets.remove(bullet)
+
+
+    ###
+    # OMEGA DRAW STEP
+    ###
     for bullet in bullets:
+        pg.draw.rect(screen, bullet_color, bullet)
 
-                pg.draw.rect(screen, bullet_color, bullet)
+    player = pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
 
+    for enemy in enemies:
+        enemy.draw(screen)
+        pass
 
     # flip() the display to put your work on screen
     pg.display.flip()
@@ -80,9 +113,7 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(FPS) / 1000
 
 pg.quit()
 
-#Hejsan
-#hej
+#main()
