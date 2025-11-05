@@ -21,6 +21,10 @@ pg.mixer.music.set_volume(.015)
 #pg.mixer.music.play()
 # pg.mixer.music.play()
 
+#####GUI Setup######
+ui_manager = pgg.UIManager((WIDTH, HEIGHT))
+
+
 level1 = "src/scenes/background.png"
 
 background = pg.image.load(level1)
@@ -30,21 +34,39 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 clock = pg.time.Clock()
 running = True
 
+enemies_killed = 0                                  #Killed enemies tracker
+boss_killed = 0                                     #Killed boss
+score = 0                                           #Score
+
 #Create sprite classes
 all_sprites = pg.sprite.Group()
 bullet_group = pg.sprite.Group()
 enemy_group = pg.sprite.Group()
+boss_group = pg.sprite.Group()
 
 #Create player
 player = Player (WIDTH // 2, HEIGHT // 2)
 all_sprites.add(player)
 
-#Spawn enemies (5)
-for _ in range (5):                                             
-    enemy = Enemy()
-    enemy.spawn(player.pos)
-    enemy_group.add(enemy)
-    all_sprites.add(enemy)
+
+#### UI Elements ####
+#Create a text-label for score
+score_label = pgg.elements.UILabel(
+    relative_rect=pg.Rect(10, 10, 150, 30), text=f"Score: {score}",             #Position and size, text that shows
+    manager=ui_manager                                                          #Connect to manager
+)
+
+#Create a health bar
+health_bar = pgg.elements.UIProgressBar(
+    relative_rect=pg.Rect(10, 50, 200, 25),                                     #Position and size
+    manager=ui_manager
+)
+
+health_bar.set_current_progress(player.health)                                  #Startvalue of healthbar
+
+
+
+                                        
 
 
 
@@ -55,6 +77,8 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+        
+        ui_manager.process_events(event)
 
     screen.blit(background, (0,0))
 
@@ -64,29 +88,76 @@ while running:
     player.Sprint(keys)
     player.Shoot(bullet_group)
 
+    #### Update healthbar ####
+    health_bar.set_current_progress(player.health)
+
+    #### Update scoreboard ####
+    score_label.set_text(f"Score: {score}")
+
+    
+    ####Spwawns####
+    #Spawn enemies
+    if len(enemy_group) < 5 and enemies_killed < 5:
+        enemy = Enemy()
+        enemy.spawn(player.pos)
+        enemy_group.add(enemy)
+        all_sprites.add(enemy)
+
+    #Spawn boss
+    if enemies_killed >= 5 and len(boss_group) == 0 and boss_killed == 0:
+        boss = Boss()
+        boss.spawn(player.pos)
+        boss_group.add(boss)
+        all_sprites.add(boss)
+
+
     #Update bullets
     bullet_group.update()
+    #Update enemies
     enemy_group.update(dt, player.pos)
+    #Update boss
+    boss_group.update(dt, player.pos)
 
 
-    #Check for collisions
-    hits_player = pg.sprite.spritecollide(player, enemy_group, False)               #Collision between player and enemy
+    ###### Check for collisions ######
+    #Collision between player and enemy
+    hits_player = pg.sprite.spritecollide(player, enemy_group, False)              
     if hits_player:
         player.health -= 1
-
     if player.health <= 0:
         running = False
 
-    hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)     #Collision between bullet and enemy
+    #Collision between bullet and enemy
+    hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)     
     for bullets, enemies in hits_enemy.items():
         for enemy in enemies:
             enemy.hp -= 1
             if enemy.hp <= 0:
                 enemy.kill()
+                enemies_killed += 1
+                score += 10
 
-    #Draw 
+    #Collision between bullet and boss
+    hits_boss = pg.sprite.groupcollide(bullet_group, boss_group, True, False)       
+    for bullets, boss in hits_boss.items():
+        for boss in boss:
+            boss.hp -= 1
+            if boss.hp <= 0:
+                boss.kill()
+                boss_killed += 1
+                score += 50
+
+    #### Draw sprites #####
     all_sprites.draw(screen)
     bullet_group.draw(screen)
+
+    #### Update healthbar and scoreboard ####
+    health_bar.set_current_progress(player.health)
+    score_label.set_text(f"Score: {score}")
+
+    #### Draw healthbar and scoreboard #####
+    ui_manager.update(dt)
+    ui_manager.draw_ui(screen)
 
     # flip() the display to put your work on screen
     pg.display.flip()

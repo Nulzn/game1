@@ -87,7 +87,7 @@ class Bullet (pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         super().__init__()
 
-        self.image = pygame.Surface((6,6))                      #Create a rect that represents the bullet
+        self.image = pygame.Surface((8,8))                      #Create a rect that represents the bullet
         self.image.fill ((255, 0, 0))                           #Colour the bullet red
 
         self.rect = self.image.get_rect(center = (x,y))         #Keep the rect on the screen
