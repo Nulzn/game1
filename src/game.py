@@ -39,6 +39,7 @@ running = True
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2) # Player start position
 
+<<<<<<< HEAD
 # BULLET SETTINGS
 bullet_color = (255, 0, 0)
 bullet_speed = 7
@@ -46,7 +47,18 @@ bullets = []
 
 # Bullet autoskjut timing
 shoot_delay = 300  # Shoot Delay (Milliseconds)
+=======
+# bullet inställningar
+bullet_color = (255, 50, 50)
+bullet_radius = 6.  # storlek på bullet
+bullet_speed = 400  # pixels per second
+bullets = []
+
+# bullet  timing
+shoot_delay = 400  # millisekunder mellan skott
+>>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
 last_shot_time = pg.time.get_ticks()
+last_move_direction = pg.Vector2(0, -1)  
 
 dt = 0 # Delta Time
 
@@ -81,19 +93,36 @@ while running:
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
         player_pos.x -= MOVEMENT_SPEED * dt
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
+<<<<<<< HEAD
         player_pos.x += MOVEMENT_SPEED * dt
 
     # Automatic Shooting
+=======
+        player_pos.x += 300 * dt
+
+    #skjut beroende på rörelse
+>>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
     current_time = pg.time.get_ticks()
 
+    # få rörelse riktning
+    movement = pg.Vector2(0, 0)
+    if keys[pg.K_w]: movement.y = -1
+    if keys[pg.K_s]: movement.y = 1
+    if keys[pg.K_a]: movement.x = -1
+    if keys[pg.K_d]: movement.x = 1
+
+    # uppdatera senaste rörelseriktning
+    if movement.length() != 0:
+        movement = movement.normalize()
+        last_move_direction = movement
+
+    # skjut om last_shot_time är högre än shoot_delay
     if current_time - last_shot_time >= shoot_delay:
-
-        bullet=pg.Rect(player_pos.x - 3, player_pos.y - 40, 6, 12)
-
-        bullets.append(bullet)
-
+        bullet_pos = player_pos.copy()
+        bullets.append({"pos": bullet_pos, "dir": last_move_direction.copy()})
         last_shot_time = current_time
 
+<<<<<<< HEAD
         #Move bullets
     for bullet in bullets[:]:
         bullet.y -= bullet_speed
@@ -103,6 +132,21 @@ while running:
 
     for bullet in bullets:
         pg.draw.rect(screen, bullet_color, bullet)
+=======
+    # uppdatera bullet positioner
+    for bullet in bullets[:]:
+        bullet["pos"] += bullet["dir"] * bullet_speed * dt
+        if (
+            bullet["pos"].x < 0 or bullet["pos"].x > WIDTH
+            or bullet["pos"].y < 0 or bullet["pos"].y > HEIGHT
+        ):
+            bullets.remove(bullet)
+
+    # rita bullets
+    for bullet in bullets:
+        pg.draw.circle(screen, bullet_color, bullet["pos"], bullet_radius)
+
+>>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
 
     # flip() the display to put your work on screen
     pg.display.flip()
