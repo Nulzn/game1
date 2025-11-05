@@ -5,12 +5,14 @@ class Player (pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()                          
         
-        self.image = pygame.image.load("assets/sounds/Player.png").convert_alpha()      #Load image that represent the player
+        self.image = pygame.image.load("assets/images/Player.png").convert_alpha()      #Load image that represent the player
 
         self.rect = self.image.get_rect(center = (x,y))     #Rect for collision and posision
 
         self.health = 3                                     #Player health
         self.speed = 4                                      #Movementspeed
+
+        self.pos = pygame.Vector2(x, y)                     #Vector that keeps playerposision
 
         self.last_shot = 0                                  #Time since last shot (to relagate shotspeeed)
         self.shoot_delay = 300                              #Time between shots, in ms
@@ -33,10 +35,14 @@ class Player (pygame.sprite.Sprite):
         if keys [pygame.K_s]:
             movement.y = 1                                   #Player move down, when pressing s
 
-        #When player moves, update the direction
+        #When player moves, update the direction and position
         if movement.length() > 0:
+            #Direction
             movement = movement.normalize()
             self.direction = movement
+            #Posision
+            self.pos += movement * self.speed
+            self.rect.center = self.pos
 
         self.rect.x += movement.x * self.speed
         self.rect.y += movement.y * self.speed
@@ -71,6 +77,9 @@ class Player (pygame.sprite.Sprite):
             bullet_group.add(bullet)                                                    #Add bullet to the spritegroup
             self.last_shot = current_time                                               #Save when the lastest shot fired
 
+    def update(self):
+        self.pos += self.direction * self.speed
+        self.rect.center = self.pos
 
 
 #Class for the bullets

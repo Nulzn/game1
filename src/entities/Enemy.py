@@ -3,12 +3,19 @@ from pygame import *
 import math
 import random
 
-class Enemy (sprite.Sprite):
+
+
+class Enemy (pg.sprite.Sprite):
     def __init__(self, groups="enemy"):
-        colors = ["red","orange","pink"]
-        self.color = colors[random.randint(0, len(colors)-1)]
+        super().__init__()
+        images = ["assets/images/Zombie1.png","assets/images/Zombie2.png","assets/images/Zombie3.png"]
+        self.original_image = pg.image.load(random.choice(images)).convert_alpha()
+        self.size = 75
+        self.image = pg.transform.scale(self.original_image, (self.size, self.size))
         self.pos = pg.Vector2(300,300)
-        self.size = 30
+    
+        
+        self.rect = self.image.get_rect(center=self.pos)
         
         self.speed = 25
         self.hp = 4
@@ -33,11 +40,13 @@ class Enemy (sprite.Sprite):
         self.pos = player_pos + pg.Vector2(distance*spawn_x, distance*spawn_y)
         self.speed = enemy_speed
 
-        pass
 
     def update(self, delta, player_pos):        
         direction = (player_pos - self.pos).normalize() 
-        self.pos += direction*self.speed*delta
+        if direction.length() != 0:
+            direction = direction.normalize()
+            self.pos += direction*self.speed*delta
+            self.rect.center = self.pos
 
     def deal_dmg(self, dmg_amount):
         # returns true if enemy died
