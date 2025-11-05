@@ -39,24 +39,14 @@ running = True
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2) # Player start position
 
-<<<<<<< HEAD
-# BULLET SETTINGS
-bullet_color = (255, 0, 0)
-bullet_speed = 7
-bullets = []
-
-# Bullet autoskjut timing
-shoot_delay = 300  # Shoot Delay (Milliseconds)
-=======
 # bullet inställningar
 bullet_color = (255, 50, 50)
-bullet_radius = 6.  # storlek på bullet
+bullet_radius = 6   # storlek på bullet
 bullet_speed = 400  # pixels per second
 bullets = []
 
 # bullet  timing
 shoot_delay = 400  # millisekunder mellan skott
->>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
 last_shot_time = pg.time.get_ticks()
 last_move_direction = pg.Vector2(0, -1)  
 
@@ -66,6 +56,8 @@ score = 0
 
 
 while running:
+    dt = clock.tick(FPS) / 1000
+
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
@@ -93,15 +85,9 @@ while running:
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
         player_pos.x -= MOVEMENT_SPEED * dt
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
-<<<<<<< HEAD
         player_pos.x += MOVEMENT_SPEED * dt
 
     # Automatic Shooting
-=======
-        player_pos.x += 300 * dt
-
-    #skjut beroende på rörelse
->>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
     current_time = pg.time.get_ticks()
 
     # få rörelse riktning
@@ -122,17 +108,6 @@ while running:
         bullets.append({"pos": bullet_pos, "dir": last_move_direction.copy()})
         last_shot_time = current_time
 
-<<<<<<< HEAD
-        #Move bullets
-    for bullet in bullets[:]:
-        bullet.y -= bullet_speed
-
-        if bullet.bottom < 0:
-            bullets.remove(bullet)
-
-    for bullet in bullets:
-        pg.draw.rect(screen, bullet_color, bullet)
-=======
     # uppdatera bullet positioner
     for bullet in bullets[:]:
         bullet["pos"] += bullet["dir"] * bullet_speed * dt
@@ -144,9 +119,8 @@ while running:
 
     # rita bullets
     for bullet in bullets:
-        pg.draw.circle(screen, bullet_color, bullet["pos"], bullet_radius)
+        pg.draw.circle(screen, bullet_color, (int(bullet["pos"].x), int(bullet["pos"].y)), bullet_radius)
 
->>>>>>> 3de907650f990fcefd008dd5c8e90e6332a02205
 
     # flip() the display to put your work on screen
     pg.display.flip()
@@ -154,7 +128,6 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(FPS) / 1000
 
 pg.quit()
 
