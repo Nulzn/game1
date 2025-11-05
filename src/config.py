@@ -1,7 +1,7 @@
 # Gameplay Constants
 HEIGHT, WIDTH = 1280, 720
 FPS = 60
-GAME_SOUNDTRACK = "soundtrack"
+GAME_SOUNDTRACK = "soundtrack2"
 
 # Player Constants
 MOVEMENT_SPEED = 300
