@@ -3,7 +3,7 @@ import pygame as pg
 import pygame_gui as pgg
 from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
 from utils.Sound import GetSoundById
-
+from entities.Enemy import Enemy
 ### ENTITIES ###
 from entities.Player import Player
 from entities.Enemy import Enemy1, Enemy2
@@ -20,7 +20,7 @@ pg.mixer.init()
 pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
 pg.mixer.music.set_volume(.025)
 
-pg.mixer.music.play()
+#pg.mixer.music.play()
 
 
 screen = pg.display.set_mode((HEIGHT, WIDTH))
@@ -56,6 +56,17 @@ dt = 0 # Delta Time
 score = 0 # Player Score
 
 
+def spawn_enemy():
+
+    enemy = Enemy()
+    enemy.spawn(player_pos)
+    enemies.append(enemy)
+
+#def main():
+    
+for _ in range(5):
+    spawn_enemy()
+
 while running:
     dt = clock.tick(FPS) / 1000
 
@@ -75,9 +86,11 @@ while running:
     # Fill the screen with a color to wipe away anything from last frame
     #screen.fill("lightblue")
 
-    pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
-
+  
+    
+    #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
+    
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= MOVEMENT_SPEED * dt
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
@@ -85,6 +98,12 @@ while running:
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
         player_pos.x -= MOVEMENT_SPEED * dt
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
+        player_pos.x += MOVEMENT_SPEED * dt
+
+    for enemy in enemies:
+        enemy.update(dt,player_pos)
+    
+    #auto skjut
         player_pos.x += MOVEMENT_SPEED * dt
 
     # Automatic Shooting

@@ -6,3 +6,4 @@ GAME_SOUNDTRACK = "soundtrack"
 # Player Constants
 MOVEMENT_SPEED = 300
 PLAYER_SIZE = 40
+ENEMY_SPEED = 250
