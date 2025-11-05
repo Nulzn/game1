@@ -9,9 +9,6 @@ from entities.Player import Player
 from entities.Enemy import Enemy1, Enemy2
 from entities.Boss import Boss
 
-### GUI ###
-from gui.Label import Label
-
 ### SCENES ###
 level_1 = "src/scenes/background.png"
 
@@ -31,28 +28,32 @@ pg.display.set_caption('Game V1')
 
 background = pg.image.load(level_1)
 manager = pgg.UIManager((HEIGHT, WIDTH))
-score = Label("000000", pg.Vector2(20, 20), screen)
 
+### GUI ###
+from gui.Label import Label
+score_label = Label("000000", pg.Vector2(500, 500), screen)
 
+### GAME CLOCK & RUNNING STATE ###
 clock = pg.time.Clock()
 running = True
 
+### PLAYER POSITION ###
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2) # Player start position
 
-# bullet inställningar
+### BULLET SETTINGS ###
 bullet_color = (255, 50, 50)
 bullet_radius = 6   # storlek på bullet
 bullet_speed = 400  # pixels per second
 bullets = []
 
-# bullet  timing
-shoot_delay = 400  # millisekunder mellan skott
+### BULLET TIMING ###
+shoot_delay = 400  # milliseconds between projectiles
 last_shot_time = pg.time.get_ticks()
 last_move_direction = pg.Vector2(0, -1)  
 
 dt = 0 # Delta Time
 
-score = 0
+score = 0 # Player Score
 
 
 while running:
@@ -79,7 +80,6 @@ while running:
     keys = pg.key.get_pressed()
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= MOVEMENT_SPEED * dt
-        score += 10
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
         player_pos.y += MOVEMENT_SPEED * dt
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
@@ -121,15 +121,7 @@ while running:
     for bullet in bullets:
         pg.draw.circle(screen, bullet_color, (int(bullet["pos"].x), int(bullet["pos"].y)), bullet_radius)
 
-
     # flip() the display to put your work on screen
     pg.display.flip()
 
-    # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
-
 pg.quit()
-
-#Hejsan
-#hej
