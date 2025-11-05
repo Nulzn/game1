@@ -1,19 +1,33 @@
 # Example file showing a circle moving on screen
 import pygame as pg
-from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
+import pygame_gui as pgg # pip3 install pygame_gui
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
 
 from entities.Enemy import Enemy
 
-file = "assets/sounds/soundtrack.mp3"
+from utils.Sound import GetSoundById
+
+from gui.Label import Label
+
+level_1 = "src/scenes/background.png"
+
 # pg setup
 pg.init()
 pg.mixer.init()
 
-pg.mixer.music.load(file)
+### MUSIC SETUP ###
+pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
+pg.mixer.music.set_volume(.015)
 
-#pg.mixer.music.play()
+pg.mixer.music.play()
 
 screen = pg.display.set_mode((HEIGHT, WIDTH))
+pg.display.set_caption('Game V1')
+
+background = pg.image.load(level_1)
+manager = pgg.UIManager((HEIGHT, WIDTH))
+score = Label("000000", pg.Vector2(20, 20), screen)
+
 clock = pg.time.Clock()
 running = True
 
@@ -46,15 +60,21 @@ for _ in range(5):
     spawn_enemy()
 
 while running:
+    dt = clock.tick(FPS) / 1000
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-    dt = clock.tick(FPS) / 1000
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("lightblue")
+        manager.process_events(event)
+    
+    manager.update(dt)
+
+    screen.blit(background, (0, 0))
+    manager.draw_ui(screen)
+
+    
     #direction = player_pos - enemy_pos
     #if direction.length() > 0:
     #     direction = direction.normalize()
