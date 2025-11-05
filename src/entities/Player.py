@@ -1,5 +1,5 @@
 import pygame
-from config import WIDTH, HEIGTH
+from config import WIDTH, HEIGHT
 
 class Player (pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
@@ -45,7 +45,7 @@ class Player (pygame.sprite.Sprite):
 
         #Keep character within the window
         self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.x.WIDTH))
-        self.rect.y = max(0, min(self.rect.y, HEIGTH - self.rect.y.HEIGTH))
+        self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.y.HEIGHT))
 
     
     def Sprint(self, keys):
@@ -86,7 +86,7 @@ class Bullet (pygame.sprite.Sprite):
         self.rect.x += self.direction.x * self.speed            #Move the bullet in the direction of the playermovement
         self.rect.y += self.direction.y * self.speed
 
-        if (self.rect.x < 0 or self.rect.x > WIDTH) or (self.rect.y < 0 or self.rect.y > HEIGTH):
+        if (self.rect.x < 0 or self.rect.x > WIDTH) or (self.rect.y < 0 or self.rect.y > HEIGHT):
             self.kill()                                         #If the bullet leaves the screen, remove it
 
 
