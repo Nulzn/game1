@@ -1,78 +1,146 @@
 # Example file showing a circle moving on screen
 import pygame as pg
-from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
+import pygame_gui as pgg # pip3 install pygame_gui
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
 
-file = "assets/sounds/soundtrack.mp3"
+from entities.Enemy import Enemy
+
+from utils.Sound import GetSoundById
+
+from gui.Label import Label
+
+level_1 = "src/scenes/background.png"
+
 # pg setup
 pg.init()
 pg.mixer.init()
 
-pg.mixer.music.load(file)
+### MUSIC SETUP ###
+pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
+pg.mixer.music.set_volume(.015)
 
 pg.mixer.music.play()
 
 screen = pg.display.set_mode((HEIGHT, WIDTH))
+pg.display.set_caption('Game V1')
+
+background = pg.image.load(level_1)
+manager = pgg.UIManager((HEIGHT, WIDTH))
+score = Label("000000", pg.Vector2(20, 20), screen)
+
 clock = pg.time.Clock()
 running = True
 
 player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+#enemy_pos = pg.Vector2(PLAYER_SIZE*10, PLAYER_SIZE*10)
+enemies = []
+
 
 # bullet inställningar
-bullet_color = (255, 0, 0)
-bullet_speed = 7
+bullet_color = (255, 50, 50)
+bullet_radius = 6   # storlek på bullet
+bullet_speed = 400  # pixels per second
 bullets = []
 
-# bullet autoskjut timing
-shoot_delay = 300  # millisekunder mellan skott
+# bullet  timing
+shoot_delay = 400  # millisekunder mellan skott
 last_shot_time = pg.time.get_ticks()
+last_move_direction = pg.Vector2(0, -1)  
 
+
+def spawn_enemy():
+
+    enemy = Enemy()
+    enemy.spawn(player_pos)
+    enemies.append(enemy)
+
+#def main():
+    
+for _ in range(5):
+    spawn_enemy()
 
 while running:
+    dt = clock.tick(FPS) / 1000
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("lightblue")
+        manager.process_events(event)
+    
+    manager.update(dt)
 
-    pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
+    screen.blit(background, (0, 0))
+    manager.draw_ui(screen)
 
+    
+    #direction = player_pos - enemy_pos
+    #if direction.length() > 0:
+    #     direction = direction.normalize()
+    #enemy_pos += direction * 200
+
+  
+    
+    #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
-    if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
-        player_pos.y -= 300 * dt
-    if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
-        player_pos.y += 300 * dt
-    if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
-        player_pos.x -= 300 * dt
-    if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
-        player_pos.x += 300 * dt
 
+    if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
+        player_pos.y -= MOVEMENT_SPEED * dt
+    if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
+        player_pos.y += MOVEMENT_SPEED * dt
+    if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
+        player_pos.x -= MOVEMENT_SPEED * dt
+    if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
+        player_pos.x += MOVEMENT_SPEED * dt
+
+    for enemy in enemies:
+        enemy.update(dt,player_pos)
+    
     #auto skjut
+
+        # få rörelse riktning
+    movement = pg.Vector2(0, 0)
+    if keys[pg.K_w]: movement.y = -1
+    if keys[pg.K_s]: movement.y = 1
+    if keys[pg.K_a]: movement.x = -1
+    if keys[pg.K_d]: movement.x = 1
+
+    # uppdatera senaste rörelseriktning
+    if movement.length() != 0:
+        movement = movement.normalize()
+        last_move_direction = movement
 
     current_time = pg.time.get_ticks()
 
     if current_time - last_shot_time >= shoot_delay:
-
-        bullet=pg.Rect(player_pos.x - 3, player_pos.y - 40, 6, 12)
-
-        bullets.append(bullet)
-
+        bullet_pos = player_pos.copy()
+        bullets.append({"pos": bullet_pos, "dir": last_move_direction.copy()})
         last_shot_time = current_time
 
-        #flytta bullets
+    # uppdatera bullet positioner
     for bullet in bullets[:]:
-
-        bullet.y -= bullet_speed
-
-        if bullet.bottom < 0:
-
+        bullet["pos"] += bullet["dir"] * bullet_speed * dt
+        if (
+            bullet["pos"].x < 0 or bullet["pos"].x > WIDTH
+            or bullet["pos"].y < 0 or bullet["pos"].y > HEIGHT
+        ):
             bullets.remove(bullet)
+
+    # rita bullets
     for bullet in bullets:
+        pg.draw.circle(screen, bullet_color, (int(bullet["pos"].x), int(bullet["pos"].y)), bullet_radius)
 
-                pg.draw.rect(screen, bullet_color, bullet)
 
+    ###
+    # OMEGA DRAW STEP
+    ###
+
+    player = pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
+
+    for enemy in enemies:
+        enemy.draw(screen)
+        pass
 
     # flip() the display to put your work on screen
     pg.display.flip()
@@ -80,9 +148,7 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
-    dt = clock.tick(FPS) / 1000
 
 pg.quit()
 
-#Hejsan
-#hej
+#main()
