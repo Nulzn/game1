@@ -1,12 +1,11 @@
 import pygame
-from config import WIDTH, HEIGHT
+from config import HEIGHT, WIDTH
 
 class Player (pygame.sprite.Sprite):
-    def __init__(self, x, y, radius):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)      #Creata a circle that represents the character
+    def __init__(self, x, y):
+        super().__init__()                          
         
-        pygame.draw.circle(self.image, (255, 0, 0), (radius, radius), radius)       #Draw a circle on the surface of the character (red)
+        self.image = pygame.image.load("assets/sounds/Player.png").convert_alpha()      #Load image that represent the player
 
         self.rect = self.image.get_rect(center = (x,y))     #Rect for collision and posision
 
@@ -44,8 +43,15 @@ class Player (pygame.sprite.Sprite):
 
 
         #Keep character within the window
-        self.rect.x = max(0, min(self.rect.x, WIDTH - self.rect.x.WIDTH))
-        self.rect.y = max(0, min(self.rect.y, HEIGHT - self.rect.y.HEIGHT))
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.top < 0:
+            self.rect.top = 0
+        if self.rect.bottom > HEIGHT:
+            self.rect.bottom = HEIGHT
+
 
     
     def Sprint(self, keys):
@@ -72,7 +78,7 @@ class Bullet (pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         super().__init__()
 
-        self.image = pygame.Surface((8,8))                      #Create a rect that represents the bullet
+        self.image = pygame.Surface((6,6))                      #Create a rect that represents the bullet
         self.image.fill ((255, 0, 0))                           #Colour the bullet red
 
         self.rect = self.image.get_rect(center = (x,y))         #Keep the rect on the screen

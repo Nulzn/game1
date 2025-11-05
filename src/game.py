@@ -1,6 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame as pg
-import pygame_gui as pgg
+import pygame_gui as pgg # pip3 install pygame_gui
 from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
 from utils.Sound import GetSoundById
 ### ENTITIES ###
@@ -8,30 +8,30 @@ from entities.Player import Player
 from entities.Enemy import Enemy
 from entities.Boss import Boss
 
-### GUI ###
+from entities.Enemy import Enemy
+
+from utils.Sound import GetSoundById
+
 from gui.Label import Label
 
-### SCENES ###
 level_1 = "src/scenes/background.png"
 
-### PYGAME SETUP ###
+# pg setup
 pg.init()
 pg.mixer.init()
 
 ### MUSIC SETUP ###
 pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
-pg.mixer.music.set_volume(.025)
+pg.mixer.music.set_volume(.015)
 
-#pg.mixer.music.play()
+pg.mixer.music.play()
 
-
-screen = pg.display.set_mode((HEIGHT, WIDTH))
+screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption('Game V1')
 
 background = pg.image.load(level_1)
 manager = pgg.UIManager((HEIGHT, WIDTH))
 score = Label("000000", pg.Vector2(20, 20), screen)
-
 
 clock = pg.time.Clock()
 running = True
@@ -77,13 +77,12 @@ for _ in range(wave_size):
 
 while running:
     dt = clock.tick(FPS) / 1000
-
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-        
+
         manager.process_events(event)
     
     manager.update(dt)
@@ -91,8 +90,11 @@ while running:
     screen.blit(background, (0, 0))
     manager.draw_ui(screen)
 
-    # Fill the screen with a color to wipe away anything from last frame
-    #screen.fill("lightblue")
+    
+    #direction = player_pos - enemy_pos
+    #if direction.length() > 0:
+    #     direction = direction.normalize()
+    #enemy_pos += direction * 200
 
     if enemies_left_in_wave <= 0:
         # Spawn new Wave 
@@ -104,10 +106,9 @@ while running:
     
     #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
-    
+
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= MOVEMENT_SPEED * dt
-        score += 10
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
         player_pos.y += MOVEMENT_SPEED * dt
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
@@ -120,10 +121,7 @@ while running:
     
     #auto skjut
 
-    # Automatic Shooting
-    current_time = pg.time.get_ticks()
-
-    # få rörelse riktning
+        # få rörelse riktning
     movement = pg.Vector2(0, 0)
     if keys[pg.K_w]: movement.y = -1
     if keys[pg.K_s]: movement.y = 1
@@ -135,7 +133,8 @@ while running:
         movement = movement.normalize()
         last_move_direction = movement
 
-    # skjut om last_shot_time är högre än shoot_delay
+    current_time = pg.time.get_ticks()
+
     if current_time - last_shot_time >= shoot_delay:
         bullet_pos = player_pos.copy()
         bullets.append({"pos": bullet_pos, "dir": last_move_direction.copy()})
@@ -175,6 +174,13 @@ while running:
     # rita bullets
     for bullet in bullets:
         pg.draw.circle(screen, bullet_color, (int(bullet["pos"].x), int(bullet["pos"].y)), bullet_radius)
+
+
+    ###
+    # OMEGA DRAW STEP
+    ###
+
+    player = pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
 
     for enemy in enemies:
         enemy.draw(screen)
