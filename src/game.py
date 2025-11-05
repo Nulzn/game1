@@ -1,59 +1,37 @@
 # Example file showing a circle moving on screen
 import pygame as pg
-import pygame_gui as pgg
-from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
-from utils.Sound import GetSoundById
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
+
 from entities.Enemy import Enemy
-### ENTITIES ###
-from entities.Player import Player
-from entities.Enemy import Enemy1, Enemy2
-from entities.Boss import Boss
 
-### SCENES ###
-level_1 = "src/scenes/background.png"
-
-### PYGAME SETUP ###
+file = "assets/sounds/soundtrack.mp3"
+# pg setup
 pg.init()
 pg.mixer.init()
 
-### MUSIC SETUP ###
-pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
-pg.mixer.music.set_volume(.025)
+pg.mixer.music.load(file)
 
 #pg.mixer.music.play()
 
-
 screen = pg.display.set_mode((HEIGHT, WIDTH))
-pg.display.set_caption('Game V1')
-
-background = pg.image.load(level_1)
-manager = pgg.UIManager((HEIGHT, WIDTH))
-
-### GUI ###
-from gui.Label import Label
-score_label = Label("000000", pg.Vector2(500, 500), screen)
-
-### GAME CLOCK & RUNNING STATE ###
 clock = pg.time.Clock()
 running = True
 
-### PLAYER POSITION ###
-player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2) # Player start position
+player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+#enemy_pos = pg.Vector2(PLAYER_SIZE*10, PLAYER_SIZE*10)
+enemies = []
 
-### BULLET SETTINGS ###
+
+# bullet inställningar
 bullet_color = (255, 50, 50)
 bullet_radius = 6   # storlek på bullet
 bullet_speed = 400  # pixels per second
 bullets = []
 
-### BULLET TIMING ###
-shoot_delay = 400  # milliseconds between projectiles
+# bullet  timing
+shoot_delay = 400  # millisekunder mellan skott
 last_shot_time = pg.time.get_ticks()
 last_move_direction = pg.Vector2(0, -1)  
-
-dt = 0 # Delta Time
-
-score = 0 # Player Score
 
 
 def spawn_enemy():
@@ -68,29 +46,25 @@ for _ in range(5):
     spawn_enemy()
 
 while running:
-    dt = clock.tick(FPS) / 1000
-
     # poll for events
     # pg.QUIT event means the user clicked X to close your window
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-        
-        manager.process_events(event)
-    
-    manager.update(dt)
+    dt = clock.tick(FPS) / 1000
 
-    screen.blit(background, (0, 0))
-    manager.draw_ui(screen)
-
-    # Fill the screen with a color to wipe away anything from last frame
-    #screen.fill("lightblue")
+    # fill the screen with a color to wipe away anything from last frame
+    screen.fill("lightblue")
+    #direction = player_pos - enemy_pos
+    #if direction.length() > 0:
+    #     direction = direction.normalize()
+    #enemy_pos += direction * 200
 
   
     
     #enemy = pg.draw.circle(screen,"red",enemy_pos, 30)
     keys = pg.key.get_pressed()
-    
+
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
         player_pos.y -= MOVEMENT_SPEED * dt
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
@@ -104,12 +78,8 @@ while running:
         enemy.update(dt,player_pos)
     
     #auto skjut
-        player_pos.x += MOVEMENT_SPEED * dt
 
-    # Automatic Shooting
-    current_time = pg.time.get_ticks()
-
-    # få rörelse riktning
+        # få rörelse riktning
     movement = pg.Vector2(0, 0)
     if keys[pg.K_w]: movement.y = -1
     if keys[pg.K_s]: movement.y = 1
@@ -121,7 +91,8 @@ while running:
         movement = movement.normalize()
         last_move_direction = movement
 
-    # skjut om last_shot_time är högre än shoot_delay
+    current_time = pg.time.get_ticks()
+
     if current_time - last_shot_time >= shoot_delay:
         bullet_pos = player_pos.copy()
         bullets.append({"pos": bullet_pos, "dir": last_move_direction.copy()})
@@ -140,7 +111,24 @@ while running:
     for bullet in bullets:
         pg.draw.circle(screen, bullet_color, (int(bullet["pos"].x), int(bullet["pos"].y)), bullet_radius)
 
+
+    ###
+    # OMEGA DRAW STEP
+    ###
+
+    player = pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
+
+    for enemy in enemies:
+        enemy.draw(screen)
+        pass
+
     # flip() the display to put your work on screen
     pg.display.flip()
 
+    # limits FPS to 60
+    # dt is delta time in seconds since last frame, used for framerate-
+    # independent physics.
+
 pg.quit()
+
+#main()
