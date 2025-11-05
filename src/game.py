@@ -1,30 +1,56 @@
 # Example file showing a circle moving on screen
 import pygame as pg
-from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE
+import pygame_gui as pgg
+from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
+from utils.Sound import GetSoundById
 
-file = "assets/sounds/soundtrack.mp3"
-# pg setup
+### ENTITIES ###
+from entities.Player import Player
+from entities.Enemy import Enemy1, Enemy2
+from entities.Boss import Boss
+
+### GUI ###
+from gui.Label import Label
+
+### SCENES ###
+level_1 = "src/scenes/background.png"
+
+### PYGAME SETUP ###
 pg.init()
 pg.mixer.init()
 
-pg.mixer.music.load(file)
+### MUSIC SETUP ###
+pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
+pg.mixer.music.set_volume(.025)
 
 pg.mixer.music.play()
 
+
 screen = pg.display.set_mode((HEIGHT, WIDTH))
+pg.display.set_caption('Game V1')
+
+background = pg.image.load(level_1)
+manager = pgg.UIManager((HEIGHT, WIDTH))
+score = Label("000000", pg.Vector2(20, 20), screen)
+
+
 clock = pg.time.Clock()
 running = True
 
-player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+player_pos = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2) # Player start position
 
-# bullet inställningar
+# BULLET SETTINGS
 bullet_color = (255, 0, 0)
 bullet_speed = 7
 bullets = []
 
-# bullet autoskjut timing
-shoot_delay = 300  # millisekunder mellan skott
+# Bullet autoskjut timing
+shoot_delay = 300  # Shoot Delay (Milliseconds)
 last_shot_time = pg.time.get_ticks()
+
+dt = 0 # Delta Time
+
+score = 0
 
 
 while running:
@@ -33,24 +59,31 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
+        
+        manager.process_events(event)
+    
+    manager.update(dt)
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("lightblue")
+    screen.blit(background, (0, 0))
+    manager.draw_ui(screen)
+
+    # Fill the screen with a color to wipe away anything from last frame
+    #screen.fill("lightblue")
 
     pg.draw.circle(screen, "yellow", player_pos, PLAYER_SIZE)
 
     keys = pg.key.get_pressed()
     if keys[pg.K_w] and player_pos.y > (PLAYER_SIZE):
-        player_pos.y -= 300 * dt
+        player_pos.y -= MOVEMENT_SPEED * dt
+        score += 10
     if keys[pg.K_s] and player_pos.y < screen.get_height()-(PLAYER_SIZE):
-        player_pos.y += 300 * dt
+        player_pos.y += MOVEMENT_SPEED * dt
     if keys[pg.K_a] and player_pos.x > (PLAYER_SIZE):
-        player_pos.x -= 300 * dt
+        player_pos.x -= MOVEMENT_SPEED * dt
     if keys[pg.K_d] and player_pos.x < screen.get_width()-(PLAYER_SIZE):
-        player_pos.x += 300 * dt
+        player_pos.x += MOVEMENT_SPEED * dt
 
-    #auto skjut
-
+    # Automatic Shooting
     current_time = pg.time.get_ticks()
 
     if current_time - last_shot_time >= shoot_delay:
@@ -61,18 +94,15 @@ while running:
 
         last_shot_time = current_time
 
-        #flytta bullets
+        #Move bullets
     for bullet in bullets[:]:
-
         bullet.y -= bullet_speed
 
         if bullet.bottom < 0:
-
             bullets.remove(bullet)
+
     for bullet in bullets:
-
-                pg.draw.rect(screen, bullet_color, bullet)
-
+        pg.draw.rect(screen, bullet_color, bullet)
 
     # flip() the display to put your work on screen
     pg.display.flip()
