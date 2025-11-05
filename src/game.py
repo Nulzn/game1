@@ -21,7 +21,7 @@ pg.mixer.music.set_volume(.015)
 
 pg.mixer.music.play()
 
-screen = pg.display.set_mode((HEIGHT, WIDTH))
+screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption('Game V1')
 
 background = pg.image.load(level_1)

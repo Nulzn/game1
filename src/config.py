@@ -1,5 +1,5 @@
 # Gameplay Constants
-HEIGHT, WIDTH = 1280, 720
+HEIGHT, WIDTH = 720, 1280
 FPS = 60
 GAME_SOUNDTRACK = "soundtrack2"
 
