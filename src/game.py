@@ -8,8 +8,6 @@ from entities.Player import Player
 from entities.Enemy import Enemy
 from entities.Boss import Boss
 
-file = "assets/sounds/soundtrack.mp3"
-file = "assets/sounds/soundtrack2.mp3"
 # pg setup
 pg.init()
 pg.mixer.init()
@@ -56,14 +54,18 @@ score_label = pgg.elements.UILabel(
     manager=ui_manager                                                          #Connect to manager
 )
 
+score_label.text_colour = "#FFFFFF"
+
 #Create a health bar
 health_bar = pgg.elements.UIProgressBar(
     relative_rect=pg.Rect(10, 50, 200, 25),                                     #Position and size
     manager=ui_manager
 )
 
-health_bar.set_current_progress(player.health)                                  #Startvalue of healthbar
-
+health_bar.set_current_progress(player.health)   
+health_bar.bar_filled_colour = "#50F527"
+health_bar.bar_unfilled_colour = "#F54927"                              #Startvalue of healthbar
+health_bar.text_colour = "#FFFFFF"
 
 
                                         
