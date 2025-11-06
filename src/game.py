@@ -31,6 +31,8 @@ level1 = "src/scenes/background.png"
 
 background = pg.image.load(level1)
 
+player_is_dead = False
+
 clock = pg.time.Clock()
 running = True
 
@@ -74,7 +76,7 @@ health_bar.set_current_progress(player.health)
 health_bar.bar_filled_colour = "#50F527"
 health_bar.bar_unfilled_colour = "#F54927"                              #Startvalue of healthbar
 health_bar.text_colour = "#FFFFFF"
-
+#loading Screen:
 loading = True
 loading_start = pg.time.get_ticks()  # när vi började ladda
 
@@ -90,8 +92,8 @@ while loading:
     pg.display.flip()
 
     # simulera laddning (t.ex. ladda resurser här)
-    if pg.time.get_ticks() - loading_start > 2000:
-        loading = False  # efter 2 sekunder, gå vidare
+    if pg.time.get_ticks() - loading_start > 3000:
+        loading = False  # efter x sekunder, gå vidare
 
 # fortsätt till spelet
 print("Startar spelet...")
@@ -148,7 +150,7 @@ while running:
     if hits_player:
         player.health -= 1
     if player.health <= 0:
-        running = False
+        player_is_dead = True
 
     # Collision between bullet and enemy
     hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)
@@ -188,5 +190,31 @@ while running:
     # limits FPS to 60
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
+
+    if player_is_dead == True:
+        font = pg.font.Font(None, 50)
+        #loading Screen:
+        loading = True
+        loading_start = pg.time.get_ticks() 
+        loading_image = pg.image.load("assets/images/Game_over.jpeg").convert_alpha() # när vi började ladda
+
+        while loading:
+            # hantera events (så fönstret svarar)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    exit()
+
+            # rita “Loading…”-text
+            screen.blit(loading_image, (0, 0))
+            pg.display.flip()
+
+            # simulera laddning (t.ex. ladda resurser här)
+            if pg.time.get_ticks() - loading_start > 3000:
+                loading = False  # efter x sekunder, gå vidare
+
+            
+        pg.quit()
+        exit()
 
 pg.quit()
