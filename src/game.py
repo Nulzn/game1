@@ -10,8 +10,6 @@ from entities.Boss import Boss
 import sys
 
 
-file = "assets/sounds/soundtrack.mp3"
-file = "assets/sounds/soundtrack2.mp3"
 # pg setup
 pg.init()
 pg.mixer.init()
@@ -61,6 +59,9 @@ score_label = pgg.elements.UILabel(
 )
 
 # Create a health bar
+score_label.text_colour = "#FFFFFF"
+
+#Create a health bar
 health_bar = pgg.elements.UIProgressBar(
     relative_rect=pg.Rect(10, 50, 200, 25),  # Position and size
     manager=ui_manager
@@ -69,6 +70,10 @@ health_bar = pgg.elements.UIProgressBar(
 health_bar.set_current_progress(player.health)  # Startvalue of healthbar
 
 font = pg.font.Font(None, 50)
+health_bar.set_current_progress(player.health)   
+health_bar.bar_filled_colour = "#50F527"
+health_bar.bar_unfilled_colour = "#F54927"                              #Startvalue of healthbar
+health_bar.text_colour = "#FFFFFF"
 
 loading = True
 loading_start = pg.time.get_ticks()  # när vi började ladda
