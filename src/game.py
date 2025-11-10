@@ -50,7 +50,7 @@ boss_group = pg.sprite.Group()
 # Create player
 player = Player(WIDTH // 2, HEIGHT // 2)
 all_sprites.add(player)
-
+player_imunity = 30
 
 #### UI Elements ####
 # Create a text-label for score
@@ -146,9 +146,18 @@ while running:
 
     ###### Check for collisions ######
     # Collision between player and enemy
+    # and with immunity 
     hits_player = pg.sprite.spritecollide(player, enemy_group, False)
-    if hits_player:
-        player.health -= 1
+    boss_hits_player = pg.sprite.spritecollide(player, boss_group, False)
+    if player_imunity > 0:
+        player_imunity -= 1
+    else:
+        if boss_hits_player:
+            player.health -= 10
+            player_imunity = 30
+        elif hits_player:
+            player.health -= 1
+            player_imunity = 30
     if player.health <= 0:
         player_is_dead = True
 
