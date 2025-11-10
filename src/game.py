@@ -59,7 +59,7 @@ player_imunity = 30
 # Create a text-label for score
 
 def updateScore():
-    return f"{"0"*(6-len(list(str(score))))}{score}"
+    return f"{'0'*(6-len(list(str(score))))}{score}"
 
 score_label = pgg.elements.UILabel(
     # Position and size, text that shows
