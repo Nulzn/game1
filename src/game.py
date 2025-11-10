@@ -169,13 +169,6 @@ while running:
     if player.health <= 0:
         player_is_dead = True
     
-    #Collision between player and boss
-    boss_hits_player = pg.sprite.spritecollide(player, boss_group, False)
-    if boss_hits_player:
-        player.health -= 3
-        if player.health <= 0:
-            player_is_dead = True
-
     # Collision between bullet and enemy
     hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)
     for bullets, enemies in hits_enemy.items():
