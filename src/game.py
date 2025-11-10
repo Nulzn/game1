@@ -153,8 +153,8 @@ while running:
     boss_group.update(dt, player.pos)
 
     ###### Check for collisions ######
-    # Collision between player and enemy
-    hits_player = pg.sprite.spritecollide(player, enemy_group, False)
+    # Collision between player and enemy and boss
+    hits_player = pg.sprite.spritecollide(player, enemy_group, False) or pg.sprite.spritecollide(player, boss_group, False)
     if hits_player:
         player.health -= 1
     if player.health <= 0:
