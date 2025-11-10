@@ -1,16 +1,16 @@
-# Example file showing a circle moving on screen
 import json
 import pygame as pg
-import pygame_gui as pgg  # pip3 install pygame_gui
+import pygame_gui as pgg
 from config import HEIGHT, WIDTH, FPS, GAME_SOUNDTRACK
 from utils.Sound import GetSoundById
+
 ### ENTITIES ###
 from entities.Player import Player
 from entities.Enemy import Enemy
 from entities.Boss import Boss
 
 
-# pg setup
+### PYGAME SETUP ###
 pg.init()
 pg.mixer.init()
 screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -20,8 +20,7 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.mixer.music.load(GetSoundById(GAME_SOUNDTRACK))
 pg.mixer.music.set_volume(.015)
 
-# pg.mixer.music.play()
-# pg.mixer.music.play()
+pg.mixer.music.play()
 
 ##### GUI Setup######
 with open("src/label.json", "r") as f:
@@ -40,31 +39,31 @@ clock = pg.time.Clock()
 running = True
 
 
-enemies_killed = 0  # Killed enemies tracker
-boss_killed = 0  # Killed boss
-score = 0  # Score
+enemies_killed = 0
+boss_killed = 0
+score = 0
 
-# Create sprite classes
+### SPRITE CLASSES ###
 all_sprites = pg.sprite.Group()
 bullet_group = pg.sprite.Group()
 enemy_group = pg.sprite.Group()
 boss_group = pg.sprite.Group()
 
-# Create player
+### PLAYER ###
 player = Player(WIDTH // 2, HEIGHT // 2)
 all_sprites.add(player)
 
 
-#### UI Elements ####
-# Create a text-label for score
-
 def updateScore():
-    return f"{"0"*(6-len(list(str(score))))}{score}"
+    return f"{"0"*(6-len(list(str(score))))}{score}" # Updates the score label
 
+#### UI Elements ####
+
+# Create a text-label for score
 score_label = pgg.elements.UILabel(
     # Position and size, text that shows
     relative_rect=pg.Rect(850, 10, 700, 30), text=updateScore(),
-    manager=ui_manager  # Connect to manager
+    manager=ui_manager
 )
 
 # Create a health bar
@@ -84,32 +83,32 @@ health_bar.bar_filled_colour = "#50F527"
 health_bar.bar_unfilled_colour = "#F54927"                              #Startvalue of healthbar
 health_bar.text_colour = "#FFFFFF"
 
-#loading Screen:
+### LOADING SCREEN ###
 loading = True
-loading_start = pg.time.get_ticks()  # när vi började ladda
+loading_start = pg.time.get_ticks() # Start Time Of Loading
 
 while loading:
-    # hantera events (så fönstret svarar)
+    # Quits on user actions
     for event in pg.event.get():
         if event.type == pg.QUIT:
             loading = False
 
-    # rita “Loading…”-text
+    # Draw loading text to screen surface
     loading_image = pg.image.load("assets/images/Loading_Screen.png").convert_alpha()
     screen.blit(loading_image, (0, 0))
     pg.display.flip()
 
-    # simulera laddning (t.ex. ladda resurser här)
+    # Simulating loading
     if pg.time.get_ticks() - loading_start > 3000:
         loading = False  # efter x sekunder, gå vidare
 
-# fortsätt till spelet
-print("Startar spelet...")
+
+# Start game
+print("Game is starting...")
 
 while running:
-    dt = clock.tick(FPS) / 1000
-    # poll for events
-    # pg.QUIT event means the user clicked X to close your window
+    dt = clock.tick(FPS) / 1000 # Delta time for simulating physics
+
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
@@ -124,13 +123,12 @@ while running:
     player.Sprint(keys)
     player.Shoot(bullet_group)
 
-    #### Update healthbar ####
-    health_bar.set_current_progress(player.health)
+    health_bar.set_current_progress(player.health) # Updating healthbar
 
-    #### Update scoreboard ####
-    score_label.set_text(updateScore())
+    score_label.set_text(updateScore()) # Updating score label
 
-    #### Spwawns####
+    ### SPAWNS ###
+
     # Spawn enemies
     if len(enemy_group) < 5 and enemies_killed < 5:
         enemy = Enemy()
@@ -145,14 +143,14 @@ while running:
         boss_group.add(boss)
         all_sprites.add(boss)
 
-    # Update bullets
-    bullet_group.update()
-    # Update enemies
-    enemy_group.update(dt, player.pos)
-    # Update boss
-    boss_group.update(dt, player.pos)
+    bullet_group.update() # Updates bullets
 
-    ###### Check for collisions ######
+    enemy_group.update(dt, player.pos) # Updates enemies
+
+    boss_group.update(dt, player.pos) # Updates boss
+
+    ### COLLISIONS ###
+
     # Collision between player and enemy
     hits_player = pg.sprite.spritecollide(player, enemy_group, False)
     if hits_player:
@@ -180,46 +178,40 @@ while running:
                 boss_killed += 1
                 score += 50
 
-    #### Draw sprites #####
+    ### DRAW SPRITES ###
     all_sprites.draw(screen)
     bullet_group.draw(screen)
 
-    #### Update healthbar and scoreboard ####
+    ### Update healthbar and scoreboard ###
     health_bar.set_current_progress(player.health)
     score_label.set_text(updateScore())
 
-    #### Draw healthbar and scoreboard #####
+    ### Draw healthbar and scoreboard ###
     ui_manager.update(dt)
     ui_manager.draw_ui(screen)
 
-    # flip() the display to put your work on screen
-    pg.display.flip()
-
-    # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
+    pg.display.flip() # Updates screen
 
     if player_is_dead:
         font = pg.font.Font(None, 50)
-        #loading Screen:
+        
+        ### GAME OVER SCREEN ###
         loading = True
         loading_start = pg.time.get_ticks() 
-        loading_image = pg.image.load("assets/images/Game_over.jpeg").convert_alpha() # när vi började ladda
+        loading_image = pg.image.load("assets/images/Game_over.jpeg").convert_alpha()
 
         while loading:
-            # hantera events (så fönstret svarar)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
                     exit()
 
-            # rita “Loading…”-text
+            # Draw "Game Over"-image to screen
             screen.blit(loading_image, (0, 0))
             pg.display.flip()
 
-            # simulera laddning (t.ex. ladda resurser här)
             if pg.time.get_ticks() - loading_start > 3000:
-                loading = False  # efter x sekunder, gå vidare
+                loading = False
 
             
         pg.quit()

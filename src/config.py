@@ -1,11 +1,11 @@
-# Gameplay Constants
+### GAMEPLAY VALUES ###
 HEIGHT, WIDTH = 720, 1280
 FPS = 60
 
-# Player Constants
+### PLAYER VALUES ###
 MOVEMENT_SPEED = 300
 PLAYER_SIZE = 40
 ENEMY_SPEED = 250
 
-### SOUND ###
+### SOUNDS ###
 GAME_SOUNDTRACK = "soundtrack2"
