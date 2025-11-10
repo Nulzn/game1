@@ -9,7 +9,7 @@ class Player (pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect(center = (x,y))     #Rect for collision and posision
 
-        self.health = 3                                     #Player health
+        self.health = 100                                     #Player health
         self.speed = 4                                      #Movementspeed
 
         self.pos = pygame.Vector2(x, y)                     #Vector that keeps playerposision
