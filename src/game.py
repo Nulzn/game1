@@ -1,13 +1,13 @@
 # Example file showing a circle moving on screen
+import json
 import pygame as pg
 import pygame_gui as pgg  # pip3 install pygame_gui
-from config import HEIGHT, WIDTH, FPS, MOVEMENT_SPEED, PLAYER_SIZE, GAME_SOUNDTRACK
+from config import HEIGHT, WIDTH, FPS, GAME_SOUNDTRACK
 from utils.Sound import GetSoundById
 ### ENTITIES ###
 from entities.Player import Player
 from entities.Enemy import Enemy
 from entities.Boss import Boss
-import sys
 
 
 # pg setup
@@ -24,7 +24,10 @@ pg.mixer.music.set_volume(.015)
 # pg.mixer.music.play()
 
 ##### GUI Setup######
-ui_manager = pgg.UIManager((WIDTH, HEIGHT))
+with open("src/label.json", "r") as f:
+    theme = json.load(f)
+
+ui_manager = pgg.UIManager((WIDTH, HEIGHT), theme_path=theme)
 
 
 level1 = "src/scenes/background.png"
@@ -54,9 +57,13 @@ player_imunity = 30
 
 #### UI Elements ####
 # Create a text-label for score
+
+def updateScore():
+    return f"{"0"*(6-len(list(str(score))))}{score}"
+
 score_label = pgg.elements.UILabel(
     # Position and size, text that shows
-    relative_rect=pg.Rect(10, 10, 150, 30), text=f"Score: {score}",
+    relative_rect=pg.Rect(850, 10, 700, 30), text=updateScore(),
     manager=ui_manager  # Connect to manager
 )
 
@@ -65,7 +72,7 @@ score_label.text_colour = "#FFFFFF"
 
 #Create a health bar
 health_bar = pgg.elements.UIProgressBar(
-    relative_rect=pg.Rect(10, 50, 200, 25),  # Position and size
+    relative_rect=pg.Rect(10, 10, 200, 25),  # Position and size
     manager=ui_manager
 )
 
@@ -76,6 +83,7 @@ health_bar.set_current_progress(player.health)
 health_bar.bar_filled_colour = "#50F527"
 health_bar.bar_unfilled_colour = "#F54927"                              #Startvalue of healthbar
 health_bar.text_colour = "#FFFFFF"
+
 #loading Screen:
 loading = True
 loading_start = pg.time.get_ticks()  # när vi började ladda
@@ -120,7 +128,7 @@ while running:
     health_bar.set_current_progress(player.health)
 
     #### Update scoreboard ####
-    score_label.set_text(f"Score: {score}")
+    score_label.set_text(updateScore())
 
     #### Spwawns####
     # Spawn enemies
@@ -187,7 +195,7 @@ while running:
 
     #### Update healthbar and scoreboard ####
     health_bar.set_current_progress(player.health)
-    score_label.set_text(f"Score: {score}")
+    score_label.set_text(updateScore())
 
     #### Draw healthbar and scoreboard #####
     ui_manager.update(dt)
@@ -200,7 +208,7 @@ while running:
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
 
-    if player_is_dead == True:
+    if player_is_dead:
         font = pg.font.Font(None, 50)
         #loading Screen:
         loading = True
