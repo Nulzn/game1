@@ -52,10 +52,10 @@ boss_group = pg.sprite.Group()
 ### PLAYER ###
 player = Player(WIDTH // 2, HEIGHT // 2)
 all_sprites.add(player)
-
+player_imunity = 30
 
 def updateScore():
-    return f"{"0"*(6-len(list(str(score))))}{score}" # Updates the score label
+    return f"{'0'*(6-len(list(str(score))))}{score}"
 
 #### UI Elements ####
 
@@ -152,12 +152,21 @@ while running:
     ### COLLISIONS ###
 
     # Collision between player and enemy
+    # and with immunity 
     hits_player = pg.sprite.spritecollide(player, enemy_group, False)
-    if hits_player:
-        player.health -= 1
+    boss_hits_player = pg.sprite.spritecollide(player, boss_group, False)
+    if player_imunity > 0:
+        player_imunity -= 1
+    else:
+        if boss_hits_player:
+            player.health -= 10
+            player_imunity = 30
+        elif hits_player:
+            player.health -= 1
+            player_imunity = 30
     if player.health <= 0:
         player_is_dead = True
-
+    
     # Collision between bullet and enemy
     hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)
     for bullets, enemies in hits_enemy.items():
