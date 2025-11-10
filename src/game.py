@@ -168,7 +168,7 @@ while running:
             player_imunity = 30
     if player.health <= 0:
         player_is_dead = True
-
+    
     # Collision between bullet and enemy
     hits_enemy = pg.sprite.groupcollide(bullet_group, enemy_group, True, False)
     for bullets, enemies in hits_enemy.items():
